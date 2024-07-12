@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Response, Request } from 'express';
-import { Model } from 'mongoose';
+import { Document, Model, Types } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { getModelToken } from '@nestjs/mongoose';
 
@@ -8,6 +8,8 @@ import { AuthController } from '~/app/auth/auth.controller';
 import { AuthService } from '~/app/auth/auth.service';
 import { SignInDto, SignUpDto } from '~/app/auth/auth.dto';
 import { User } from '~/schemas/user.schema';
+import { Session } from '~/schemas/session.schema';
+import { SessionService } from '~/app/session/session.service';
 
 describe('AuthController', () => {
   let authController: AuthController;
@@ -28,8 +30,13 @@ describe('AuthController', () => {
       providers: [
         AuthService,
         JwtService,
+        SessionService,
         {
           provide: getModelToken(User.name),
+          useValue: Model,
+        },
+        {
+          provide: getModelToken(Session.name),
           useValue: Model,
         },
       ],
@@ -49,12 +56,14 @@ describe('AuthController', () => {
 
     it('must return user, access token and refresh token', async () => {
       const data = {
+        _id: expect.anything(),
         accessToken: expect.anything(),
         user: expect.anything(),
         refreshToken: expect.anything(),
-      };
+      } as Document<unknown, object, Session> &
+        Session & { _id: Types.ObjectId };
 
-      jest.spyOn(authService, 'signIn').mockResolvedValue(data);
+      jest.spyOn(authService, 'signIn').mockImplementation(async () => data);
       const response = await authController.signIn(payload, res);
 
       expect(response).toBe(data);
@@ -77,7 +86,8 @@ describe('AuthController', () => {
         accessToken: expect.anything(),
         user: expect.anything(),
         refreshToken: expect.anything(),
-      };
+      } as Document<unknown, object, Session> &
+        Session & { _id: Types.ObjectId };
 
       jest.spyOn(authService, 'signUp').mockResolvedValue(data);
       const response = await authController.signUp(payload, res);

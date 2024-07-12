@@ -38,6 +38,6 @@ import 'reflect-metadata';
   SwaggerModule.setup('api/docs', app, document);
 
   await app.listen(env.PORT, () =>
-    logger.error('app running in http://localhost:'.concat(env.PORT)),
+    logger.info('app running in http://localhost:'.concat(env.PORT)),
   );
 })();
