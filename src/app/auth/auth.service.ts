@@ -1,19 +1,22 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { JwtService } from '@nestjs/jwt';
+import { compare } from 'bcrypt';
 
-import { ACCESS_TOKEN_EXPIRES_IN, REFRESH_TOKEN_EXPIRES_IN } from '~/constants';
+import { SessionService } from '~/app/session/session.service';
 import { SignInDto, SignUpDto } from '~/app/auth/auth.dto';
 import { User } from '~/schemas/user.schema';
-import { env } from '~/env';
-import { compare } from 'bcrypt';
+import {
+  EMAIL_IS_ALREDY_IN_USE,
+  INVALID_CREDENTIALS,
+  USER_NOT_FOUND,
+} from '~/errors';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
-    private readonly jwtService: JwtService,
+    private readonly sessionService: SessionService,
   ) {}
 
   async signIn(data: SignInDto) {
@@ -26,60 +29,18 @@ export class AuthService {
         role: true,
       },
     );
-    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    if (!user) throw new HttpException(USER_NOT_FOUND, HttpStatus.NOT_FOUND);
 
     const isValidPassword = await compare(data.password, user.password);
     if (!isValidPassword)
-      throw new HttpException(
-        'Credentials do not match',
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw new HttpException(INVALID_CREDENTIALS, HttpStatus.UNAUTHORIZED);
 
     user.password = undefined;
 
-    return {
-      user,
-      accessToken: await this.generateJwtAccess(user.id),
-      refreshToken: await this.generateJwtRefresh(user.id),
-    };
-  }
+    const session = await this.sessionService.findByUser(user.id);
+    if (session) return session;
 
-  async generateJwtAccess(user: string) {
-    return await this.jwtService.signAsync(
-      { user },
-      { secret: env.SECRET_KEY, expiresIn: ACCESS_TOKEN_EXPIRES_IN },
-    );
-  }
-
-  async generateJwtRefresh(user: string) {
-    return await this.jwtService.signAsync(
-      { user },
-      {
-        secret: env.SECRET_KEY,
-        expiresIn: REFRESH_TOKEN_EXPIRES_IN,
-      },
-    );
-  }
-
-  async useJwtRefresh(jwt: Record<string, string | null>) {
-    if (jwt.refreshToken) {
-      const res = await this.jwtService.decode(jwt.refreshToken);
-
-      const user = await this.userModel.findById(res.user);
-
-      if (user) {
-        return {
-          user,
-          refreshToken: jwt.refreshToken,
-          accessToken: this.generateJwtAccess(user.id),
-        };
-      }
-    }
-
-    throw new HttpException(
-      'No refresh token provided',
-      HttpStatus.UNAUTHORIZED,
-    );
+    return await this.sessionService.create(user.id);
   }
 
   async signUp(data: SignUpDto) {
@@ -87,15 +48,13 @@ export class AuthService {
       email: data.email,
     });
     if (!!emailIsAlreadyInUse)
-      throw new HttpException('Email is already in use', HttpStatus.CONFLICT);
+      throw new HttpException(EMAIL_IS_ALREDY_IN_USE, HttpStatus.CONFLICT);
 
     const user = await this.userModel.create(data);
     user.password = undefined;
 
-    return {
-      user,
-      accessToken: await this.generateJwtAccess(user.id),
-      refreshToken: await this.generateJwtRefresh(user.id),
-    };
+    const session = await this.sessionService.create(user.id);
+
+    return session;
   }
 }

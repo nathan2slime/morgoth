@@ -14,12 +14,12 @@
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,tests}/**/*.ts\" --fix",
     "commit": "git-cz",
-    "test": "jest",
+    "test": "NODE_ENV=test jest",
     "prepare": "husky",
     "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
+    "test:cov": "NODE_ENV=test jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./tests/jest-e2e.json"
+    "test:e2e": "NODE_ENV=test jest --config ./tests/jest-e2e.json"
   },
   "dependencies": {
     "@commitlint/cli": "^19.3.0",

@@ -1,17 +1,15 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { Model } from 'mongoose';
 import { Request } from 'express';
-import { InjectModel } from '@nestjs/mongoose';
 
+import { SessionService } from '~/app/session/session.service';
 import { env } from '~/env';
 import { AUTH_COOKIE } from '~/constants';
-import { User } from '~/schemas/user.schema';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor(@InjectModel(User.name) private readonly userModel: Model<User>) {
+  constructor(private readonly sessionService: SessionService) {
     super({
       ignoreExpiration: false,
       jwtFromRequest: ExtractJwt.fromExtractors([
@@ -30,9 +28,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate(payload: Record<string, string>) {
-    const user = this.userModel.findById(payload.user);
+    const session = this.sessionService.findByUser(payload.user);
 
-    if (user) return user;
+    if (session) return session;
 
     throw new UnauthorizedException();
   }
