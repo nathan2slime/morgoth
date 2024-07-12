@@ -1,23 +1,32 @@
+import * as cookieParser from 'cookie-parser';
+
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { env } from '~/env';
 
+import { HttpExceptionFilter } from '~/filters/http-exception.filter';
 import { AppModule } from '~/app/app.module';
 
-import 'reflect-metadata';
 import { logger } from '~/logger';
+import { AUTH_COOKIE } from '~/constants';
+
+import 'reflect-metadata';
 
 (async () => {
-  const app = await NestFactory.create(AppModule, {  });
+  const app = await NestFactory.create(AppModule, {});
+
+  app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
     }),
   );
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   const config = new DocumentBuilder()
+    .addCookieAuth(AUTH_COOKIE)
     .setTitle('Morgoth')
     .setDescription('Docs')
     .setVersion('1.0')
