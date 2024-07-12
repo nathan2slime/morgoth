@@ -13,5 +13,17 @@ export class SignUpDto {
 
   @ApiProperty()
   @MinLength(6)
+  @IsNotEmpty()
+  password: string;
+}
+
+export class SignInDto {
+  @ApiProperty()
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
   password: string;
 }

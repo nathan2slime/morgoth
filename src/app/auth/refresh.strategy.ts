@@ -42,8 +42,9 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
         { secret: env.SECRET_KEY, expiresIn: ACCESS_TOKEN_EXPIRES_IN },
       );
 
-      return accessToken;
+      return { user, accessToken };
     }
+
     throw new UnauthorizedException();
   }
 }

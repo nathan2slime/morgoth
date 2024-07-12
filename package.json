@@ -92,8 +92,14 @@
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
+    "moduleNameMapper": {
+      "~/(.*)": "<rootDir>/$1"
+    },
     "collectCoverageFrom": [
       "**/*.(t|j)s"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/../jest.setup.ts"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
