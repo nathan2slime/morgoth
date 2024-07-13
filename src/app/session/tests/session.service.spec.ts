@@ -12,7 +12,8 @@ describe('AuthService', () => {
   let jwtService: JwtService;
   let sessionModel: Model<Session>;
 
-  const user = expect.anything();
+  const userId = expect.anything();
+  const sessionId = expect.anything();
 
   afterEach(() => jest.clearAllMocks());
 
@@ -40,18 +41,19 @@ describe('AuthService', () => {
       const session = {
         populate: jest.fn(() => session),
       } as unknown as EntityQuery<Session, 'findOneAndUpdate'>;
+      const payload = { userId, sessionId, exp: 0 };
 
       jest.spyOn(jwtService, 'signAsync').mockResolvedValue(accessToken);
       jest.spyOn(sessionModel, 'findOneAndUpdate').mockResolvedValue(session);
 
-      const data = await sessionService.refresh(user);
+      const data = await sessionService.refresh(payload);
 
       expect(data).toBe(session);
       expect(session.populate).toHaveBeenCalledTimes(1);
       expect(session.populate).toHaveBeenCalledWith('user');
       expect(sessionModel.findOneAndUpdate).toHaveBeenCalledTimes(1);
       expect(sessionModel.findOneAndUpdate).toHaveBeenCalledWith(
-        { user, isExpired: false },
+        { id: userId, isExpired: false },
         { accessToken },
         { new: true },
       );
@@ -61,6 +63,7 @@ describe('AuthService', () => {
   describe('create', () => {
     const session = {
       populate: jest.fn(),
+      save: jest.fn(),
     };
 
     it('should create and return a new session', async () => {
@@ -69,7 +72,7 @@ describe('AuthService', () => {
         .spyOn(sessionModel, 'create')
         .mockResolvedValue(session as unknown as Entity<Session>[]);
 
-      const data = await sessionService.create(user);
+      const data = await sessionService.create(userId);
 
       expect(session.populate).toHaveBeenCalledTimes(1);
       expect(session.populate).toHaveBeenCalledWith('user');
@@ -81,34 +84,29 @@ describe('AuthService', () => {
   describe('expireSession', () => {
     it('should expire a session', async () => {
       jest
-        .spyOn(sessionModel, 'updateOne')
+        .spyOn(sessionModel, 'findByIdAndUpdate')
         .mockResolvedValue(expect.anything());
+      await sessionService.expireSession(sessionId);
 
-      await sessionService.expireSession(user);
-
-      expect(sessionModel.updateOne).toHaveBeenCalledTimes(1);
-      expect(sessionModel.updateOne).toHaveBeenCalledWith(
-        { user },
-        { isExpired: true },
-      );
+      expect(sessionModel.findByIdAndUpdate).toHaveBeenCalledTimes(1);
+      expect(sessionModel.findByIdAndUpdate).toHaveBeenCalledWith(sessionId, {
+        isExpired: true,
+      });
     });
   });
 
-  describe('findByUser', () => {
+  describe('findById', () => {
     it('must return session with user data', async () => {
       const session = {
         populate: jest.fn(() => session),
       } as unknown as EntityQuery<Session, 'findOne'>;
-      jest.spyOn(sessionModel, 'findOne').mockReturnValue(session);
+      jest.spyOn(sessionModel, 'findById').mockReturnValue(session);
 
-      const data = await sessionService.findByUser(user);
+      const data = await sessionService.findById(sessionId);
 
       expect(session.populate).toHaveBeenCalledWith('user');
       expect(session.populate).toHaveBeenCalledTimes(1);
-      expect(sessionModel.findOne).toHaveBeenCalledWith({
-        user,
-        isExpired: false,
-      });
+      expect(sessionModel.findById).toHaveBeenCalledWith(sessionId);
       expect(data).toBe(session);
     });
   });

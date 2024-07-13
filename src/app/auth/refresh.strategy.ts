@@ -30,9 +30,9 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
 
   async validate(payload: JwtAuthPayload) {
     if (payload.exp < Math.floor(Date.now() / 1000)) {
-      await this.sessionService.expireSession(payload.user);
+      await this.sessionService.expireSession(payload.sessionId);
     } else {
-      const session = await this.sessionService.refresh(payload.user);
+      const session = await this.sessionService.refresh(payload);
 
       if (session) return session;
     }

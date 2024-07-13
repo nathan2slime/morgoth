@@ -89,40 +89,27 @@ describe('AuthService', () => {
     const user = {} as unknown as Entity<User>;
     const session = {} as unknown as Entity<Session>;
 
-    it('should return the logged in user is session', async () => {
-      jest.spyOn(userModel, 'findOne').mockResolvedValue(user);
-      jest.spyOn(sessionService, 'findByUser').mockResolvedValue(session);
-      jest.spyOn(bcrypt, 'compare').mockImplementation(async () => true);
-
-      const data = await authService.signIn(payload);
-
-      expect(data).toBe(session);
-      expect(sessionService.findByUser).toHaveBeenCalledTimes(1);
-      expect(userModel.findOne).toHaveBeenCalledTimes(1);
-    });
-
     it('must log in user and create a new session', async () => {
       jest.spyOn(userModel, 'findOne').mockResolvedValue(user);
-      jest.spyOn(sessionService, 'findByUser').mockResolvedValue(null);
+      jest.spyOn(sessionService, 'findById').mockResolvedValue(null);
       jest.spyOn(sessionService, 'create').mockResolvedValue(session);
       jest.spyOn(bcrypt, 'compare').mockImplementation(async () => true);
 
       const data = await authService.signIn(payload);
 
       expect(data).toBe(session);
-      expect(sessionService.findByUser).toHaveBeenCalledTimes(1);
       expect(userModel.findOne).toHaveBeenCalledTimes(1);
     });
 
     it('should return error when password is invalid', async () => {
       jest.spyOn(userModel, 'findOne').mockResolvedValue(user);
-      jest.spyOn(sessionService, 'findByUser').mockResolvedValue(session);
+      jest.spyOn(sessionService, 'findById').mockResolvedValue(session);
       jest.spyOn(bcrypt, 'compare').mockImplementation(async () => false);
 
       await expect(authService.signIn(payload)).rejects.toThrow(
         new HttpException(INVALID_CREDENTIALS, HttpStatus.UNAUTHORIZED),
       );
-      expect(sessionService.findByUser).toHaveBeenCalledTimes(0);
+      expect(sessionService.findById).toHaveBeenCalledTimes(0);
       expect(userModel.findOne).toHaveBeenCalledTimes(1);
     });
 

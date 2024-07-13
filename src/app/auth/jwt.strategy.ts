@@ -6,6 +6,7 @@ import { Request } from 'express';
 import { SessionService } from '~/app/session/session.service';
 import { env } from '~/env';
 import { AUTH_COOKIE } from '~/constants';
+import { JwtAuthPayload } from '~/types/auth.types';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -27,8 +28,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  async validate(payload: Record<string, string>) {
-    const session = this.sessionService.findByUser(payload.user);
+  async validate(payload: JwtAuthPayload) {
+    const session = await this.sessionService.findById(payload.sessionId);
 
     if (session) return session;
 

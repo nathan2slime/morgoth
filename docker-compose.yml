@@ -4,10 +4,34 @@ services:
     restart: unless-stopped
     env_file:
       - .env.production.local
+    volumes:
+      - database:/bin/database
     ports:
-      - '27017:27017'
+      - 27017:27017
     healthcheck:
-      test: [ 'CMD', 'mongo', 'admin', '--port', '27017', '--eval', "db.adminCommand('ping').ok" ]
+      test:
+        [
+          'CMD',
+          'mongo',
+          'admin',
+          '--port',
+          '27017',
+          '--eval',
+          "db.adminCommand('ping').ok",
+        ]
       interval: 5s
       timeout: 2s
       retries: 20
+  api:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: always
+    ports:
+      - 3000:3000
+    env_file:
+      - .env.production.local
+    depends_on:
+      - mongo
+volumes:
+  database:

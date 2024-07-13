@@ -28,7 +28,7 @@ import 'reflect-metadata';
   const config = new DocumentBuilder()
     .addCookieAuth(AUTH_COOKIE)
     .setTitle('Morgoth')
-    .setDescription('Docs')
+    .setDescription('Library System Docs')
     .setVersion('1.0')
     .build();
 

@@ -1,4 +1,5 @@
 export type JwtAuthPayload = {
   exp: number;
-  user: string;
+  userId: string;
+  sessionId: string;
 };
