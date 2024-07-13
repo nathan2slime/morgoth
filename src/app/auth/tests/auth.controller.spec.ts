@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Response, Request } from 'express';
-import { Document, Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { getModelToken } from '@nestjs/mongoose';
 
@@ -10,6 +10,7 @@ import { SignInDto, SignUpDto } from '~/app/auth/auth.dto';
 import { User } from '~/schemas/user.schema';
 import { Session } from '~/schemas/session.schema';
 import { SessionService } from '~/app/session/session.service';
+import { Entity } from '~/types';
 
 describe('AuthController', () => {
   let authController: AuthController;
@@ -60,8 +61,7 @@ describe('AuthController', () => {
         accessToken: expect.anything(),
         user: expect.anything(),
         refreshToken: expect.anything(),
-      } as Document<unknown, object, Session> &
-        Session & { _id: Types.ObjectId };
+      } as Entity<Session>;
 
       jest.spyOn(authService, 'signIn').mockImplementation(async () => data);
       const response = await authController.signIn(payload, res);
@@ -86,8 +86,7 @@ describe('AuthController', () => {
         accessToken: expect.anything(),
         user: expect.anything(),
         refreshToken: expect.anything(),
-      } as Document<unknown, object, Session> &
-        Session & { _id: Types.ObjectId };
+      } as Entity<Session>;
 
       jest.spyOn(authService, 'signUp').mockResolvedValue(data);
       const response = await authController.signUp(payload, res);
