@@ -20,6 +20,7 @@ describe('AuthController', () => {
     status: jest.fn().mockReturnThis(),
     json: jest.fn(data => data),
     cookie: jest.fn(),
+    send: jest.fn().mockReturnThis(),
   } as unknown as Response;
   const req = {
     user: {},
@@ -96,6 +97,16 @@ describe('AuthController', () => {
       expect(authService.signUp).toHaveBeenCalledWith(payload);
       expect(res.status).toHaveBeenCalledTimes(1);
       expect(res.status).toHaveBeenCalledWith(201);
+    });
+  });
+
+  describe('signOut', () => {
+    it('should expire session and sign out user ', async () => {
+      jest.spyOn(authService, 'signOut').mockResolvedValue(null);
+
+      await authController.signOut(req, res);
+
+      expect(authService.signOut).toHaveBeenCalled();
     });
   });
 
