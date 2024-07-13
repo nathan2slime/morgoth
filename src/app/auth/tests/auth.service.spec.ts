@@ -81,6 +81,23 @@ describe('AuthService', () => {
     });
   });
 
+  describe('signOut', () => {
+    const session = {
+      _id: expect.anything(),
+    } as unknown as Entity<Session>;
+
+    it('must expire session by passed id', async () => {
+      jest
+        .spyOn(sessionService, 'expireSession')
+        .mockImplementation(async () => {});
+
+      await authService.signOut(session);
+
+      expect(sessionService.expireSession).toHaveBeenCalledTimes(1);
+      expect(sessionService.expireSession).toHaveBeenCalledWith(session._id);
+    });
+  });
+
   describe('signIn', () => {
     const payload: SignInDto = {
       email: expect.anything(),
