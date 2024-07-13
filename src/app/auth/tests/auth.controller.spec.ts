@@ -11,6 +11,7 @@ import { User } from '~/schemas/user.schema';
 import { Session } from '~/schemas/session.schema';
 import { SessionService } from '~/app/session/session.service';
 import { Entity } from '~/types';
+import { UserService } from '~/app/user/user.service';
 
 describe('AuthController', () => {
   let authController: AuthController;
@@ -33,6 +34,7 @@ describe('AuthController', () => {
         AuthService,
         JwtService,
         SessionService,
+        UserService,
         {
           provide: getModelToken(User.name),
           useValue: Model,

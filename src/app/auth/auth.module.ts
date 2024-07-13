@@ -11,6 +11,7 @@ import { JwtRefreshStrategy } from '~/app/auth/refresh.strategy';
 import { Session, SessionSchema } from '~/schemas/session.schema';
 import { ACCESS_TOKEN_EXPIRES_IN } from '~/constants';
 import { SessionService } from '~/app/session/session.service';
+import { UserService } from '~/app/user/user.service';
 import { env } from '~/env';
 
 @Module({
@@ -32,6 +33,7 @@ import { env } from '~/env';
     SessionService,
     JwtService,
     JwtStrategy,
+    UserService,
     JwtRefreshStrategy,
   ],
   exports: [AuthService],
