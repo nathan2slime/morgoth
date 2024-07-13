@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model } from 'mongoose';
+import { FilterQuery, Model, Types } from 'mongoose';
 
 import { User } from '~/schemas/user.schema';
 import { SignUpDto } from '~/app/auth/auth.dto';
+import { UpdateUserProfileDto } from './user.dto';
 
 @Injectable()
 export class UserService {
@@ -12,16 +13,23 @@ export class UserService {
   ) {}
 
   async create(data: SignUpDto) {
-    return await this.userModel.create(data);
+    const user = await this.userModel.create(data);
+    user.password = undefined;
+
+    return user;
   }
 
   async getByEmail(email: string) {
-    return await this.userModel.findOne({ email });
+    return this.userModel.findOne({ email });
   }
 
   async getPassword(query: FilterQuery<User>) {
-    return await this.userModel.findOne(query, {
+    return this.userModel.findOne(query, {
       password: true,
     });
+  }
+
+  async getByIdUpdate(id: string | Types.ObjectId, data: UpdateUserProfileDto) {
+    return this.userModel.findByIdAndUpdate(id, data, { new: true });
   }
 }

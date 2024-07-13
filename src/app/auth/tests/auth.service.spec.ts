@@ -17,10 +17,11 @@ import {
   INVALID_CREDENTIALS,
   USER_NOT_FOUND,
 } from '~/errors';
+import { UserService } from '~/app/user/user.service';
 
 describe('AuthService', () => {
   let authService: AuthService;
-  let userModel: Model<User>;
+  let userService: UserService;
   let sessionService: SessionService;
 
   afterEach(() => jest.clearAllMocks());
@@ -31,6 +32,7 @@ describe('AuthService', () => {
       providers: [
         AuthService,
         JwtService,
+        UserService,
         SessionService,
         {
           provide: getModelToken(User.name),
@@ -44,7 +46,7 @@ describe('AuthService', () => {
     }).compile();
 
     authService = app.get<AuthService>(AuthService);
-    userModel = app.get<Model<User>>(getModelToken(User.name));
+    userService = app.get<UserService>(UserService);
     sessionService = app.get<SessionService>(SessionService);
   });
 
@@ -54,30 +56,30 @@ describe('AuthService', () => {
       password: expect.anything(),
       name: expect.anything(),
     };
-    const user = {} as unknown as Entity<User>[];
+    const user = {} as unknown as Entity<User>;
     const session = {} as unknown as Entity<Session>;
 
     it('must create user and return his created session', async () => {
-      jest.spyOn(userModel, 'findOne').mockResolvedValue(null);
-      jest.spyOn(userModel, 'create').mockResolvedValue(user);
+      jest.spyOn(userService, 'getByEmail').mockResolvedValue(null);
+      jest.spyOn(userService, 'create').mockResolvedValue(user);
       jest.spyOn(sessionService, 'create').mockResolvedValue(session);
 
       const data = await authService.signUp(payload);
 
       expect(data).toBe(session);
       expect(sessionService.create).toHaveBeenCalledTimes(1);
-      expect(userModel.findOne).toHaveBeenCalledTimes(1);
+      expect(userService.getByEmail).toHaveBeenCalledTimes(1);
     });
 
     it('should return error if email is already in use', async () => {
-      jest.spyOn(userModel, 'findOne').mockResolvedValue(user);
+      jest.spyOn(userService, 'getByEmail').mockResolvedValue(user);
       jest.spyOn(sessionService, 'create').mockResolvedValue(session);
 
       await expect(authService.signUp(payload)).rejects.toThrow(
         new HttpException(EMAIL_IS_ALREDY_IN_USE, HttpStatus.CONFLICT),
       );
       expect(sessionService.create).toHaveBeenCalledTimes(0);
-      expect(userModel.findOne).toHaveBeenCalledTimes(1);
+      expect(userService.getByEmail).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -107,7 +109,7 @@ describe('AuthService', () => {
     const session = {} as unknown as Entity<Session>;
 
     it('must log in user and create a new session', async () => {
-      jest.spyOn(userModel, 'findOne').mockResolvedValue(user);
+      jest.spyOn(userService, 'getPassword').mockResolvedValue(user);
       jest.spyOn(sessionService, 'findById').mockResolvedValue(null);
       jest.spyOn(sessionService, 'create').mockResolvedValue(session);
       jest.spyOn(bcrypt, 'compare').mockImplementation(async () => true);
@@ -115,11 +117,11 @@ describe('AuthService', () => {
       const data = await authService.signIn(payload);
 
       expect(data).toBe(session);
-      expect(userModel.findOne).toHaveBeenCalledTimes(1);
+      expect(userService.getPassword).toHaveBeenCalledTimes(1);
     });
 
     it('should return error when password is invalid', async () => {
-      jest.spyOn(userModel, 'findOne').mockResolvedValue(user);
+      jest.spyOn(userService, 'getPassword').mockResolvedValue(user);
       jest.spyOn(sessionService, 'findById').mockResolvedValue(session);
       jest.spyOn(bcrypt, 'compare').mockImplementation(async () => false);
 
@@ -127,18 +129,18 @@ describe('AuthService', () => {
         new HttpException(INVALID_CREDENTIALS, HttpStatus.UNAUTHORIZED),
       );
       expect(sessionService.findById).toHaveBeenCalledTimes(0);
-      expect(userModel.findOne).toHaveBeenCalledTimes(1);
+      expect(userService.getPassword).toHaveBeenCalledTimes(1);
     });
 
     it('should return error when user is not found', async () => {
-      jest.spyOn(userModel, 'findOne').mockResolvedValue(null);
+      jest.spyOn(userService, 'getPassword').mockResolvedValue(null);
       jest.spyOn(bcrypt, 'compare').mockImplementation(async () => false);
 
       await expect(authService.signIn(payload)).rejects.toThrow(
         new HttpException(USER_NOT_FOUND, HttpStatus.NOT_FOUND),
       );
       expect(bcrypt.compare).toHaveBeenCalledTimes(0);
-      expect(userModel.findOne).toHaveBeenCalledTimes(1);
+      expect(userService.getPassword).toHaveBeenCalledTimes(1);
     });
   });
 });
