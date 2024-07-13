@@ -7,14 +7,14 @@ export type SessionDocument = mongoose.HydratedDocument<Session>;
 
 @Schema()
 export class Session {
-  @Prop({ required: true })
+  @Prop({ required: false })
   accessToken: string;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   refreshToken: string;
 
   @Prop({ required: true, default: false })
-  isExpired: string;
+  isExpired: boolean;
 
   @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   user: User;

@@ -11,6 +11,8 @@ import {
   INVALID_CREDENTIALS,
   USER_NOT_FOUND,
 } from '~/errors';
+import { Session } from '~/schemas/session.schema';
+import { Entity } from '~/types';
 
 @Injectable()
 export class AuthService {
@@ -37,10 +39,13 @@ export class AuthService {
 
     user.password = undefined;
 
-    const session = await this.sessionService.findByUser(user.id);
-    if (session) return session;
+    const session = await this.sessionService.create(user.id);
 
-    return await this.sessionService.create(user.id);
+    return session;
+  }
+
+  async signOut(session: Entity<Session>) {
+    await this.sessionService.expireSession(session._id);
   }
 
   async signUp(data: SignUpDto) {
