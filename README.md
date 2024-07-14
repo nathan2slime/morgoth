@@ -52,7 +52,7 @@ MONGO_INITDB_ROOT_PASSWORD="password"
 MONGO_INITDB_ROOT_DATABASE="morgoth"
 ```
 
-Para rodar o projeto em ambiente Docker, você vai precisar criar um arquivo `.env.production.local`.
+> Para rodar o projeto em ambiente Docker, você vai precisar criar um arquivo `.env.production.local`.
 
 ### Instalar dependências
 
@@ -93,7 +93,7 @@ pnpm test:e2e
 
 ### CLI
 
-Foi criado um CLI com comandos para criação de usuários com role **ADMIN**. Rode os comandos abaixo para um novo usuário com role ADMIN.
+Foi criado um CLI com comandos para criação de usuários com role **ADMIN**. Rode os comandos abaixo para criar um novo usuário com role ADMIN.
 
 ```bash
 pnpm build
