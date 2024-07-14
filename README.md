@@ -118,6 +118,9 @@ Os dados do usuário aparecerão em formato json no console.
 }
 ```
 
+## Documentação
+A documentação em Swagger está no endpoint `/api/docs`
+
 ### Docker
 Primeiro, ceritifique-se de as portas 3000 e 27017 não estejam sendo usadas por outro processo e que o arquivo de variáveis de ambiente `.env.production.local` esteja criado e com as variáveis devidamente configuradas.
 
