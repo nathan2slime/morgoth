@@ -35,7 +35,7 @@ export class CreateAuthorDto {
   biography: string;
 }
 
-export class SearchAuthorDto {
+export class QuerySearchDto {
   @ApiProperty({ required: false })
   @Transform(params => {
     if (params.value) {

@@ -16,7 +16,11 @@ export class Session {
   @Prop({ required: true, default: false })
   isExpired: boolean;
 
-  @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  @Prop({
+    required: true,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: User.name,
+  })
   user: User;
 }
 

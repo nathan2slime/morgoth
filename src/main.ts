@@ -1,12 +1,15 @@
 import * as cookieParser from 'cookie-parser';
 
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { env } from '~/env';
 
-import { HttpExceptionFilter } from '~/filters/http-exception.filter';
+import {
+  AllExceptionsFilter,
+  HttpExceptionFilter,
+} from '~/filters/http-exception.filter';
 import { AppModule } from '~/app/app.module';
 
 import { logger } from '~/logger';
@@ -23,7 +26,12 @@ import 'reflect-metadata';
       transform: true,
     }),
   );
-  app.useGlobalFilters(new HttpExceptionFilter());
+  const { httpAdapter } = app.get(HttpAdapterHost);
+
+  app.useGlobalFilters(
+    new HttpExceptionFilter(),
+    new AllExceptionsFilter(httpAdapter),
+  );
 
   const config = new DocumentBuilder()
     .addCookieAuth(AUTH_COOKIE)
