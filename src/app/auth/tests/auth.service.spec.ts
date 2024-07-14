@@ -1,7 +1,6 @@
 import * as bcrypt from 'bcrypt';
 
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthService } from '~/app/auth/auth.service';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { getModelToken } from '@nestjs/mongoose';
@@ -18,6 +17,7 @@ import {
   USER_NOT_FOUND,
 } from '~/errors';
 import { UserService } from '~/app/user/user.service';
+import { AuthService } from '~/app/auth/auth.service';
 
 describe('AuthService', () => {
   let authService: AuthService;

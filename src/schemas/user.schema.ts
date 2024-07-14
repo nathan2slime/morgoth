@@ -6,7 +6,7 @@ import { Role } from '~/types/role.enum';
 
 export type UserDocument = HydratedDocument<User>;
 
-@Schema()
+@Schema({ timestamps: true })
 export class User {
   @Prop({ required: true })
   name: string;

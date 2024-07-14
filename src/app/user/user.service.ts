@@ -4,7 +4,7 @@ import { FilterQuery, Model, Types } from 'mongoose';
 
 import { User } from '~/schemas/user.schema';
 import { SignUpDto } from '~/app/auth/auth.dto';
-import { UpdateUserProfileDto } from './user.dto';
+import { UpdateUserProfileDto } from '~/app/user/user.dto';
 
 @Injectable()
 export class UserService {
