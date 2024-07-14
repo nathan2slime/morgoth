@@ -21,6 +21,12 @@ Lista de softwares necessários para executar este aplicativo
 - [git](https://git-scm.com/)
 - [MongoDB](https://www.mongodb.com/try/download/community/)
 
+### Clone
+Clone o repositório na sua máquina, usando o comando abaixo:
+```bash
+git clone https://github.com/nathan2slime/morgoth.git
+```
+
 ### Variáveis de ​​ambiente
 
 São variáveis nomeadas para o computador e usadas por algum software. Abaixo estão todas as variáveis de ambiente dessa aplicação.
