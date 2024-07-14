@@ -15,7 +15,7 @@ import { AUTH_COOKIE } from '~/constants';
 import 'reflect-metadata';
 
 (async () => {
-  const app = await NestFactory.create(AppModule, {});
+  const app = await NestFactory.create(AppModule, { logger: false });
 
   app.use(cookieParser());
   app.useGlobalPipes(

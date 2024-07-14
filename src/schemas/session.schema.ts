@@ -5,7 +5,7 @@ import { User } from './user.schema';
 
 export type SessionDocument = mongoose.HydratedDocument<Session>;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Session {
   @Prop({ required: false })
   accessToken: string;
