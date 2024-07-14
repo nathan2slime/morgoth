@@ -4,7 +4,7 @@ import { FilterQuery, Model } from 'mongoose';
 
 import {
   CreateAuthorDto,
-  SearchAuthorDto,
+  QuerySearchDto,
   UpdateAuthorDto,
 } from '~/app/author/author.dto';
 import { Author } from '~/schemas/author.schema';
@@ -32,7 +32,7 @@ export class AuthorService {
     return this.authorModel.findById(id);
   }
 
-  async search(data: SearchAuthorDto) {
+  async search(data: QuerySearchDto) {
     const query: FilterQuery<Author> = {};
 
     if (data.query) {

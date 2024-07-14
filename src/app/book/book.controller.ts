@@ -14,31 +14,28 @@ import {
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 
-import {
-  CreateAuthorDto,
-  QuerySearchDto,
-  UpdateAuthorDto,
-} from '~/app/author/author.dto';
-import { AuthorService } from '~/app/author/author.service';
+import { CreateBookDto, UpdateBookDto } from '~/app/book/book.dto';
+import { BookService } from '~/app/book/book.service';
+import { QuerySearchDto } from '~/app/author/author.dto';
 import { JwtAuthGuard } from '~/app/auth/auth.guard';
 import { RoleGuard } from '~/app/auth/role.guard';
 import { Roles } from '~/app/auth/auth.decorator';
 import { Role } from '~/types/role.enum';
 
-@ApiTags('Author')
-@Controller('author')
-export class AuthorController {
-  constructor(private readonly authorService: AuthorService) {}
+@ApiTags('Book')
+@Controller('book')
+export class BookController {
+  constructor(private readonly bookService: BookService) {}
 
   @Post('create')
   @ApiResponse({
     status: 201,
-    description: 'Create new author',
+    description: 'Create new book',
   })
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles([Role.ADMIN])
-  async create(@Body() body: CreateAuthorDto, @Res() res: Response) {
-    const data = await this.authorService.create(body);
+  async create(@Body() body: CreateBookDto, @Res() res: Response) {
+    const data = await this.bookService.create(body);
 
     return res.status(HttpStatus.CREATED).json(data);
   }
@@ -46,10 +43,10 @@ export class AuthorController {
   @Get('show/:id')
   @ApiResponse({
     status: 200,
-    description: 'Get a author',
+    description: 'Get a book',
   })
   async getById(@Param('id') id: string, @Res() res: Response) {
-    const data = await this.authorService.getById(id);
+    const data = await this.bookService.getById(id);
 
     return res.status(HttpStatus.OK).json(data);
   }
@@ -57,12 +54,12 @@ export class AuthorController {
   @Delete('delete/:id')
   @ApiResponse({
     status: 200,
-    description: 'Delete a author',
+    description: 'Delete a book',
   })
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles([Role.ADMIN])
   async delete(@Param('id') id: string, @Res() res: Response) {
-    await this.authorService.delete(id);
+    await this.bookService.delete(id);
 
     return res.status(HttpStatus.OK).send();
   }
@@ -70,16 +67,16 @@ export class AuthorController {
   @Put('update/:id')
   @ApiResponse({
     status: 201,
-    description: 'Update a author',
+    description: 'Update a book',
   })
   @UseGuards(JwtAuthGuard, RoleGuard)
   @Roles([Role.ADMIN])
   async update(
-    @Body() body: UpdateAuthorDto,
+    @Body() body: UpdateBookDto,
     @Param('id') id: string,
     @Res() res: Response,
   ) {
-    const data = await this.authorService.update(id, body);
+    const data = await this.bookService.update(id, body);
 
     return res.status(HttpStatus.OK).json(data);
   }
@@ -87,10 +84,11 @@ export class AuthorController {
   @Get('search')
   @ApiResponse({
     status: 200,
-    description: 'Author search',
+    description: 'Book search',
   })
   async search(@Query() query: QuerySearchDto, @Res() res: Response) {
-    const data = await this.authorService.search(query);
+    const data = await this.bookService.search(query);
+
     return res.status(HttpStatus.OK).json(data);
   }
 }

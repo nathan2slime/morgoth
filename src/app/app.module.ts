@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from '~/app/auth/auth.module';
 import { UserModule } from '~/app/user/user.module';
 import { AuthorModule } from '~/app/author/author.module';
+import { BookModule } from '~/app/book/book.module';
 
 import { env } from '~/env';
 
@@ -13,6 +14,7 @@ import { env } from '~/env';
     AuthModule,
     AuthorModule,
     UserModule,
+    BookModule,
   ],
   controllers: [],
   providers: [],

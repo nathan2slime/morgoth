@@ -9,6 +9,7 @@ type PaginationArgs = {
   query: string;
   sortField: string | undefined;
 };
+
 export const paginate = async <T>(
   model: mongoose.Model<T>,
   query: mongoose.FilterQuery<T>,
